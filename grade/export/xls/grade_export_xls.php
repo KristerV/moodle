@@ -43,7 +43,7 @@ class grade_export_xls extends grade_export {
         $myxls = $workbook->add_worksheet($strgrades);
 
         // Print names of all the fields
-        $profilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields);
+        $profilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields, $this->hideuserprofilefields);
         foreach ($profilefields as $id => $field) {
             $myxls->write_string(0, $id, $field->fullname);
         }

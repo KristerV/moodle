@@ -41,6 +41,7 @@ abstract class grade_export {
     public $decimalpoints; // number of decimal points for exports
     public $onlyactive; // only include users with an active enrolment
     public $usercustomfields; // include users custom fields
+    public $hideuserprofilefields; // array Hide unselected user profile fields
 
     /**
      * Constructor should set up all the private variables ready to be pulled
@@ -54,9 +55,10 @@ abstract class grade_export {
      * @param int $decimalpoints
      * @param boolean $onlyactive
      * @param boolean $usercustomfields include user custom field in export
+     * @param string $strhideuserprofilefields comma separated list of user profile fields to hide
      * @note Exporting as letters will lead to data loss if that exported set it re-imported.
      */
-    public function grade_export($course, $groupid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $onlyactive = false, $usercustomfields = false) {
+    public function grade_export($course, $groupid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $onlyactive = false, $usercustomfields = false, $strhideuserprofilefields = '') {
         $this->course = $course;
         $this->groupid = $groupid;
         $this->grade_items = grade_item::fetch_all(array('courseid'=>$this->course->id));
@@ -92,6 +94,7 @@ abstract class grade_export {
         $this->decimalpoints = $decimalpoints;
         $this->onlyactive = $onlyactive;
         $this->usercustomfields = $usercustomfields;
+        $this->hideuserprofilefields = explode(",", $strhideuserprofilefields);
     }
 
     /**
@@ -100,6 +103,15 @@ abstract class grade_export {
      */
     function process_form($formdata) {
         global $USER;
+
+        $this->hideuserprofilefields = array();
+        if (!empty($formdata->hideuserprofilefields)) {
+            foreach ($formdata->hideuserprofilefields as $field=>$selected) {
+                if (!$selected) {
+                    $this->hideuserprofilefields[] = $field;
+                }
+            }
+        }
 
         $this->columns = array();
         if (!empty($formdata->itemids)) {
@@ -213,7 +225,7 @@ abstract class grade_export {
     public function display_preview($require_user_idnumber=false) {
         global $OUTPUT;
 
-        $userprofilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields);
+        $userprofilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields, $this->hideuserprofilefields);
         $formatoptions = new stdClass();
         $formatoptions->para = false;
 
@@ -310,16 +322,18 @@ abstract class grade_export {
             $itemidsparam = '-1';
         }
 
-        $params = array('id'                =>$this->course->id,
-                        'groupid'           =>$this->groupid,
-                        'itemids'           =>$itemidsparam,
-                        'export_letters'    =>$this->export_letters,
-                        'export_feedback'   =>$this->export_feedback,
-                        'updatedgradesonly' =>$this->updatedgradesonly,
-                        'displaytype'       =>$this->displaytype,
-                        'decimalpoints'     =>$this->decimalpoints,
-                        'export_onlyactive' =>$this->onlyactive,
-                        'usercustomfields'  =>$this->usercustomfields);
+        $strhideuserprofilefields = implode(',', $this->hideuserprofilefields);
+        $params = array('id'                    =>$this->course->id,
+                        'groupid'               =>$this->groupid,
+                        'itemids'               =>$itemidsparam,
+                        'export_letters'        =>$this->export_letters,
+                        'export_feedback'       =>$this->export_feedback,
+                        'updatedgradesonly'     =>$this->updatedgradesonly,
+                        'displaytype'           =>$this->displaytype,
+                        'decimalpoints'         =>$this->decimalpoints,
+                        'export_onlyactive'     =>$this->onlyactive,
+                        'usercustomfields'      =>$this->usercustomfields);
+                        'hideuserprofilefields' =>$strhideuserprofilefields);
 
         return $params;
     }

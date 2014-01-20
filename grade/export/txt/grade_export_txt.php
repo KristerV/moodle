@@ -36,9 +36,10 @@ class grade_export_txt extends grade_export {
      * @param boolean $onlyactive
      * @param boolean $usercustomfields include user custom field in export
      */
-    public function __construct($course, $groupid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $separator = 'comma', $onlyactive = false, $usercustomfields = false) {
-        parent::__construct($course, $groupid, $itemlist, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $onlyactive, $usercustomfields);
+    public function __construct($course, $groupid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $separator = 'comma', $onlyactive = false, $usercustomfields = false, $strhideuserprofilefields = '') {
+        parent::__construct($course, $groupid, $itemlist, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $onlyactive, $usercustomfields, $strhideuserprofilefields);
         $this->separator = $separator;
+        $this->strhideuserprofilefields = $strhideuserprofilefields;
     }
 
     public function get_export_params() {
@@ -53,7 +54,8 @@ class grade_export_txt extends grade_export {
         $export_tracking = $this->track_exports();
 
         $strgrades = get_string('grades');
-        $profilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields);
+        $hideuserprofilefields = explode(',', $this->strhideuserprofilefields);
+        $profilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields, $hideuserprofilefields);
 
         $shortname = format_string($this->course->shortname, true, array('context' => context_course::instance($this->course->id)));
         $downloadfilename = clean_filename("$shortname $strgrades");

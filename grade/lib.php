@@ -184,7 +184,7 @@ class graded_users_iterator {
         $customfieldssql = '';
         if ($this->allowusercustomfields && !empty($CFG->grade_export_customprofilefields)) {
             $customfieldscount = 0;
-            $customfieldsarray = grade_helper::get_user_profile_fields($this->course->id, $this->allowusercustomfields);
+            $customfieldsarray = grade_helper::get_user_profile_fields($this->course->id, $this->allowusercustomfields, $this->hideuserprofilefields);
             foreach ($customfieldsarray as $field) {
                 if (!empty($field->customid)) {
                     $customfieldssql .= "
@@ -2769,7 +2769,7 @@ abstract class grade_helper {
      * @param bool $includecustomfields
      * @return array An array of stdClass instances with customid, shortname, datatype, default and fullname fields
      */
-    public static function get_user_profile_fields($courseid, $includecustomfields = false) {
+    public static function get_user_profile_fields($courseid, $includecustomfields = false, $hideuserprofilefields = array()) {
         global $CFG, $DB;
 
         // Gets the fields that have to be hidden
@@ -2791,6 +2791,8 @@ abstract class grade_helper {
             foreach ($userprofilefields as $field) {
                 $field = trim($field);
                 if (in_array($field, $hiddenfields) || !in_array($field, $userdefaultfields)) {
+                    continue;
+                } else if (in_array($field, $hideuserprofilefields)) {
                     continue;
                 }
                 $obj = new stdClass();

@@ -121,6 +121,15 @@ class grade_export_form extends moodleform {
             $mform->disabledIf('validuntil', 'key', 'noteq', 1);
         }
 
+        $mform->addElement('header', 'hideuserprofilefields', get_string('profilefields', 'admin'));
+
+        $hideuserprofilefields = array_map('trim', explode(',', $CFG->grade_export_userprofilefields));
+
+        foreach ($hideuserprofilefields as $field) {
+                $mform->addElement('advcheckbox', 'hideuserprofilefields['.$field.']', get_string($field, 'moodle'));
+                $mform->setDefault('hideuserprofilefields['.$field.']', 1);
+        }
+
         $mform->addElement('header', 'gradeitems', get_string('gradeitemsinc', 'grades'));
 
         $switch = grade_get_setting($COURSE->id, 'aggregationposition', $CFG->grade_aggregationposition);

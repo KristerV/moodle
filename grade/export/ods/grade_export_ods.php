@@ -45,7 +45,7 @@ class grade_export_ods extends grade_export {
 
 
         // Print names of all the fields.
-        $profilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields);
+        $profilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields, $this->hideuserprofilefields);
         foreach ($profilefields as $id => $field) {
             $myxls->write_string(0, $id, $field->fullname);
         }
