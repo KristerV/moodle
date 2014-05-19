@@ -27,6 +27,7 @@ $string['actfilterhdr'] = 'Active filters';
 $string['addfilter'] = 'Add filter';
 $string['anycategory'] = 'any category';
 $string['anycourse'] = 'any course';
+$string['anycourses'] = 'Enroled in any courses';
 $string['anyfield'] = 'any field';
 $string['anyrole'] = 'any role';
 $string['anyvalue'] = 'any value';
